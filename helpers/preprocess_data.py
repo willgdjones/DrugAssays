@@ -6,15 +6,15 @@ import matplotlib.pyplot as plt
 import os
 # Import MINST data
 import pickle
-from helpers import Assay
+#from helpers import Assay
 from multiprocessing import Pool
 
-with open('colourmap.txt','rb') as f:
+with open('textfiles/colourmap.txt','rb') as f:
     g = f.read().splitlines()
     C = np.array([[int(y) for y in x.split(' ')] for x in g])
     cm = mpl.colors.ListedColormap(C/255.0)
 
-with open('AssayLabels.csv') as f:
+with open('textfiles/AssayLabels.csv') as f:
     labels = np.array([x.split(',') for x in f.read().splitlines()])
 
 
