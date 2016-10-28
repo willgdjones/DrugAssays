@@ -6,34 +6,34 @@ import matplotlib.pyplot as plt
 import os
 # Import MINST data
 import pickle
-from helpers import normalize, multiply_with_overflow, random_chunk1, random_chunk2
+from helpers import Assay
+from multiprocessing import Pool
+
+with open('colourmap.txt','rb') as f:
+    g = f.read().splitlines()
+    C = np.array([[int(y) for y in x.split(' ')] for x in g])
+    cm = mpl.colors.ListedColormap(C/255.0)
+
+with open('AssayLabels.csv') as f:
+    labels = np.array([x.split(',') for x in f.read().splitlines()])
 
 
-train = pickle.load(open('train.py', 'rb'))
-# train = np.array([random_chunk2(p_image,100,32) for k in range(1000)])
-# pickle.dump(train, open('train.py', 'wb'))
+run_labels = labels[np.array([x[0] for x in labels]) == 'Run 2']
+runIDs1 = ['{}_{}'.format(label[1], label[2] + '{:02d}'.format(int(label[3]))) for label in run_labels]
+runIDs0 = np.unique(['_'.join(x.split('_')[0:2]) for x in os.listdir('data/Run01test/') if x.endswith('.tif')])
+
+IDs1 = [runID for runID in runIDs1 if runID in runIDs0]
+IDs0 = runIDs0
+
+def create_assay(ID, data_dir='Run01test/'):
+    a = Assay(ID, data_dir)
+    return a
 
 
-f = open('colourmap.txt','rb')
-g = f.read().splitlines()
-f.close()
 
-C = np.array([[int(y) for y in x.split(' ')] for x in g])
-cm = mpl.colors.ListedColormap(C/255.0)
+# def f(x):
+#     return x*x
 
-
-image_name1 = '1073914843_B15_s2_w1.tif' #Red
-image_name2 = '1073914843_B15_s2_w2.tif' #Green
-path = './Run01test/'
-image1 = cv2.imread(path + image_name1)
-image2 = cv2.imread(path + image_name2)
-R = np.array(image1[:,:,0])
-G = np.array(image2[:,:,0])
-B = np.zeros(R.shape)
-raw_image = np.zeros([2160,2160,3])
-raw_image[:,:,0], raw_image[:,:,1], raw_image[:,:,2] = R, G, B
-n_image = normalize(raw_image)
-p_image = multiply_with_overflow(n_image, [3,3,1])
-
-
-    
+# if __name__ == '__main__':
+#     p = Pool(30)
+#     assays = p.map(create_assay, IDs0[0:30])

@@ -1,0 +1,1 @@
+for f in `find 140217/ ! -name '*thumb*' -name '*.tif'`; do mv $f `echo $f | cut -d'/' -f2`_`basename $f | cut -d'_' -f2,3,4 | grep -o [a-z0-9A-Z]*_[a-z0-9A-Z]*_w[1-2]`.tif; done
